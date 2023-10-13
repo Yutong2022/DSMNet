@@ -1,2 +1,2 @@
-# DSMNet_TCSVT2023
+# DSMNet
 coming soon
