@@ -32,7 +32,7 @@ Yutong Liu, Zhen Cheng, Zeyu Xiao, and Zhiwei Xiong, Light Field Super-Resolutio
 
 #### 1.1 CiytU
 
-- For the benchmark CiytU, please refer to [ATO](https://github.com/jingjin25/LFSSR-ATO) or [SAV_conv](https://github.com/Joechann0831/SAV_conv) for the preparetion of the dataset. You can downland the test dataset from [BaiduYun](https://pan.baidu.com/s/16pChtBkmeS_rz6-Bm4CWhA) or [GoogleDrive](https://drive.google.com/drive/folders/1O02hmUpFjgb92ysteO0D9v7as64NcyUI?usp=sharing) and put them into the folder *./CiytU/data/* for a readily start. 
+- For the benchmark CiytU, please refer to [ATO](https://github.com/jingjin25/LFSSR-ATO) or [SAV_conv](https://github.com/Joechann0831/SAV_conv) for the preparetion of the dataset. You can downland the test dataset from [BaiduYun](https://pan.baidu.com/s/13W_r0Bk68TUXwSflWch01A?pwd=ustc) and put them into the folder *./CiytU/data/* for a readily start. 
 
 #### 1.2 BasicLFSR
 
