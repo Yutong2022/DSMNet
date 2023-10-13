@@ -36,7 +36,7 @@ Yutong Liu, Zhen Cheng, Zeyu Xiao, and Zhiwei Xiong, Light Field Super-Resolutio
 
 #### 1.2 BasicLFSR
 
-- For the benchmark BasicLFSR, please refer to [BasicLFSR](https://github.com/ZhengyuLiang24/BasicLFSR) for the preparetion of the dataset. You can downland the test dataset from [BaiduYun](https://pan.baidu.com/s/16pChtBkmeS_rz6-Bm4CWhA) and put them into the folder *./BasicLFSR/data/* for a readily start. 
+- For the benchmark BasicLFSR, please refer to [BasicLFSR](https://github.com/ZhengyuLiang24/BasicLFSR) for the preparetion of the dataset. You can downland the test dataset from [BaiduYun](https://pan.baidu.com/s/1Ip5L-mFFg7vAK3IK8Se8QA?pwd=ustc) and put them into the folder *./BasicLFSR/data/* for a readily start. 
 
 
 ### 2. Pretrained Model Preparation
