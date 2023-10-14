@@ -43,13 +43,13 @@ Yutong Liu, Zhen Cheng, Zeyu Xiao, and Zhiwei Xiong, Light Field Super-Resolutio
 - For the Pretrained Model, please downland checkpoint from [BaiduYun](https://pan.baidu.com/s/16pChtBkmeS_rz6-Bm4CWhA) and put them into the folder *./CiytU/pretrained_model/*, while please downland checkpoint from [BaiduYun](https://pan.baidu.com/s/16pChtBkmeS_rz6-Bm4CWhA) and put them into the folder *./BasicLFSR/pretrained_model/*.
 ### 3. Train & test
 
-For CityU, to train and our DSMNet under the scale of 2 as example:
+For CityU, to train and test our DSMNet under the scale of 2 as an example:
 ```shell
 cd ./CityU/
 bash train_CityU_scale2.sh
 bash test_CityU_scale2.sh
 ```
-For BasicLFSR, to train and our DSMNet under the scale of 2 as example:
+For BasicLFSR, to train and test our DSMNet under the scale of 2 as an example:
 ```shell
 cd ./BasicLFSR/
 bash train_BasicLFSR_scale2.sh
