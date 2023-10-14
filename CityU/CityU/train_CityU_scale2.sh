@@ -1,1 +1,0 @@
-python DSMNet_training.py --scale 2 --patch_size 64 --pretrain ''  --dataset_path /data/liuyt/DataCityU
