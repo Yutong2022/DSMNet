@@ -201,11 +201,11 @@ def train(train_loader, device, net, criterion, optimizer):
 
     return loss_epoch_train, psnr_epoch_train, ssim_epoch_train
 
-
 def test_wopad(test_loader, device, net, save_dir=None):
     LF_iter_test = []
     psnr_iter_test = []
     ssim_iter_test = []
+
     for idx_iter, (Lr_SAI_y, Hr_SAI_y, Sr_SAI_cbcr, data_info, LF_name) in tqdm(enumerate(test_loader), total=len(test_loader), ncols=70):
         [Lr_angRes_in, Lr_angRes_out] = data_info
         data_info[0] = Lr_angRes_in[0].item()
@@ -216,61 +216,54 @@ def test_wopad(test_loader, device, net, save_dir=None):
         Sr_SAI_cbcr = Sr_SAI_cbcr
 
         ''' Crop LFs into Patches '''
-        subLF_main, subLF_left, subLF_down, subLF_slope = LFdivide1(Lr_SAI_y, args.angRes_in, args.patch_size_for_test)
-    
-        numU, numV, H, W = subLF_main.size()
-        subLF_main = rearrange(subLF_main, 'n1 n2 a1h a2w -> (n1 n2) 1 a1h a2w')
-        subLF_left = rearrange(subLF_left, 'n1 n2 a1h a2w -> (n1 n2) 1 a1h a2w')
-        subLF_down = rearrange(subLF_down, 'n1 n2 a1h a2w -> (n1 n2) 1 a1h a2w')
-        subLF_slope= rearrange(subLF_slope, 'n1 n2 a1h a2w -> (n1 n2) 1 a1h a2w')
-        minibatch1 = 1
-        minibatch2 = 1
-        minibatch3 = 1
-        SR_main = torch.zeros(numU * numV, 1, H * args.scale_factor, W * args.scale_factor)
-        SR_left = torch.zeros(numV, 1, H * args.scale_factor, W * args.scale_factor)
-        SR_down = torch.zeros(numU, 1, H * args.scale_factor, W * args.scale_factor)
-        SR_slope = torch.zeros(1, 1, H * args.scale_factor, W * args.scale_factor)
+        data = rearrange(Lr_SAI_y, '(a1 h) (a2 w) -> (a1 a2) 1 h w', a1=args.angRes_in, a2=args.angRes_in)
+        b, c, h, w = data.size()
+        scale  = args.scale_factor
+        h_half, w_half = h // 2, w // 2
+        
+        tmp = h_half%8
+        h_size = h_half + (8 - tmp)
+        tmp = w_half%8
+        w_size = w_half + (8 - tmp)
+        if h_size > w_size:
+            w_size = h_size
+        elif h_size < w_size:
+            h_size = w_size
 
-        for i in range(0, numU * numV, minibatch1):
-            tmp = subLF_main[:min(i + minibatch1, numU * numV), :, :, :]
+        lr_list = [
+            data[:, :, 0:h_size, 0:w_size],
+            data[:, :, 0:h_size, (w - w_size):w],
+            data[:, :, (h - h_size):h, 0:w_size],
+            data[:, :, (h - h_size):h, (w - w_size):w]]
+
+        sr_list = []
+        for i in range(0, 4):
+            lr_batch = lr_list[i]
+            lr_batch = rearrange(lr_batch, '(a1 a2) 1 h w -> 1 1 (a1 h) (a2 w)', a1=args.angRes_in, a2=args.angRes_in)
             with torch.no_grad():
-                    net.eval()
-                    tmp = net(tmp.to(device), data_info)
-                    torch.cuda.empty_cache()
-                    SR_main[:min(i + minibatch1, numU * numV), :, :, :] = tmp
-
-        for i in range(0, numV, minibatch2):
-            tmp = subLF_left[:min(i + minibatch2, numV), :, :, :]
-            with torch.no_grad():
-                    net.eval()
-                    tmp = net(tmp.to(device), data_info)
-                    torch.cuda.empty_cache()
-                    SR_left[:min(i + minibatch2, numV), :, :, :] = tmp
-
-        for i in range(0, numU, minibatch3):
-            tmp = subLF_down[:min(i + minibatch3, numU), :, :, :]
-            with torch.no_grad():
-                    net.eval()
-                    tmp = net(tmp.to(device), data_info)
-                    torch.cuda.empty_cache()
-                    SR_down[:min(i + minibatch3, numU), :, :, :] = tmp
-
-        with torch.no_grad():
                 net.eval()
-                tmp = net(subLF_slope.to(device), data_info)
-                torch.cuda.empty_cache()
-                SR_slope[:,:,:,:] = tmp
+                sr_batch = net(lr_batch)
+            sr_list.append(sr_batch)
 
-        SR_main = rearrange(SR_main, '(n1 n2) 1 a1h a2w -> n1 n2 a1h a2w', n1=numU ,n2=numV)
-        SR_left = rearrange(SR_left, '(n1 n2) 1 a1h a2w -> n1 n2 a1h a2w', n1=1 ,n2=numV)
-        SR_down = rearrange(SR_down, '(n1 n2) 1 a1h a2w -> n1 n2 a1h a2w', n1=numU ,n2=1)
-        SR_slope = rearrange(SR_slope, '(n1 n2) 1 a1h a2w -> n1 n2 a1h a2w', n1=1 ,n2=1)
+        h, w = scale * h, scale * w
+        h_half, w_half = scale * h_half, scale * w_half
+        h_size, w_size = scale * h_size, scale * w_size
 
-        LFout = torch.zeros_like(Hr_SAI_y)
-        LFout = rearrange(LFout, '1 1 (u h) (v w) -> (u v) h w', u=args.angRes_out, v=args.angRes_out)
-        Sr_4D_y = LFintegrate1(SR_main, SR_left, SR_down, SR_slope, args.angRes_out, args.patch_size_for_test, LFout, args.scale_factor)
-        Sr_SAI_y = rearrange(Sr_4D_y, '(u v) h w -> 1 1 (u h) (v w)', u=args.angRes_out, v=args.angRes_out)
-        # Sr_SAI_y = rearrange(Sr_4D_y, 'a1 a2 h w -> 1 1 (a1 h) (a2 w)')
+        sr_list[0] = rearrange(sr_list[0], '1 1 (a1 h) (a2 w) -> (a1 a2) 1 h w', a1=args.angRes_in, a2=args.angRes_in)
+        sr_list[1] = rearrange(sr_list[1], '1 1 (a1 h) (a2 w) -> (a1 a2) 1 h w', a1=args.angRes_in, a2=args.angRes_in)
+        sr_list[2] = rearrange(sr_list[2], '1 1 (a1 h) (a2 w) -> (a1 a2) 1 h w', a1=args.angRes_in, a2=args.angRes_in)
+        sr_list[3] = rearrange(sr_list[3], '1 1 (a1 h) (a2 w) -> (a1 a2) 1 h w', a1=args.angRes_in, a2=args.angRes_in)
+
+        outLF = data.new(b, c, h, w)
+        outLF[:, :, 0:h_half, 0:w_half] \
+            = sr_list[0][:, :, 0:h_half, 0:w_half]
+        outLF[:, :, 0:h_half, w_half:w] \
+            = sr_list[1][:, :, 0:h_half, (w_size - w + w_half):w_size]
+        outLF[:, :, h_half:h, 0:w_half] \
+            = sr_list[2][:, :, (h_size - h + h_half):h_size, 0:w_half]
+        outLF[:, :, h_half:h, w_half:w] \
+            = sr_list[3][:, :, (h_size - h + h_half):h_size, (w_size - w + w_half):w_size]
+        Sr_SAI_y = rearrange(outLF, '(a1 a2) 1 h w -> 1 1 (a1 h) (a2 w)', a1=args.angRes_in, a2=args.angRes_in).cpu()
 
         ''' Calculate the PSNR & SSIM '''
         psnr, ssim = cal_metrics(args, Hr_SAI_y, Sr_SAI_y)
