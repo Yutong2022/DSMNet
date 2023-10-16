@@ -14,12 +14,12 @@ parser.add_argument("--path_pre_pth", type=str, default='', help="path for pre m
 parser.add_argument('--data_name', type=str, default='ALL',
                     help='EPFL, HCI_new, HCI_old, INRIA_Lytro, Stanford_Gantry, ALL(of Five Datasets)')
 
-parser.add_argument('--path_for_train', type=str, default='')
-parser.add_argument('--path_for_test', type=str, default='')
+parser.add_argument('--path_for_train', type=str, default='./data/data_for_training/')
+parser.add_argument('--path_for_test', type=str, default='./data/data_for_test/')
 
 parser.add_argument('--path_log', type=str, default='./log/')
 parser.add_argument("--resume_path", type=str, default="", help="resume from checkpoint path")
-parser.add_argument("--pretrain", type=str, default="pretrained-model/model_epoch_14000.pth", help="resume from checkpoint path")
+parser.add_argument("--pretrain", type=str, default="", help="resume from checkpoint path")
 
 parser.add_argument('--batch_size', type=int, default=4)
 parser.add_argument('--lr', type=float, default=1e-4, help='initial learning rate')
