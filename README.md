@@ -59,18 +59,17 @@ bash test_BasicLFSR_scale2.sh
 ## Citation
 
 If you find this work helpful, please consider citing our paper.
-
-coming soon.
-<!-- ```latex
-@InProceedings{Cheng_2021_CVPR,
-    author    = {Cheng, Zhen and Xiong, Zhiwei and Chen, Chang and Liu, Dong and Zha, Zheng-Jun},
-    title     = {Light Field Super-Resolution With Zero-Shot Learning},
-    booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
-    month     = {June},
-    year      = {2021},
-    pages     = {10010-10019}
-}
-``` -->
+```latex
+@ARTICLE{10268449,
+  author={Liu, Yutong and Cheng, Zhen and Xiao, Zeyu and Xiong, Zhiwei},
+  journal={IEEE Transactions on Circuits and Systems for Video Technology}, 
+  title={Light Field Super-Resolution Using Decoupled Selective Matching}, 
+  year={2023},
+  volume={},
+  number={},
+  pages={1-1},
+  doi={10.1109/TCSVT.2023.3321085}}
+```
 
 ## Related Projects
 [ATO](https://github.com/jingjin25/LFSSR-ATO)
