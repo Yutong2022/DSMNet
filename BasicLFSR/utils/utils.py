@@ -123,49 +123,6 @@ def LFdivide(data, angRes, patch_size, stride):
 
     return subLF
 
-def LFdivide1(data, angRes, patch_size):
-    data = rearrange(data, '(a1 h) (a2 w) -> (a1 a2) 1 h w', a1=angRes, a2=angRes)
-    [_, _, h0, w0] = data.size()
-
-    h = h0 - h0%patch_size
-    w = w0 - h0%patch_size
-    data_main = data[:, :, :h, :w]
-    data_left = data[:, :, -patch_size:, :w]
-    data_down = data[:, :, :h, -patch_size:]
-    data_slope = data[:, :, -patch_size:, -patch_size:]
-
-    subLF_main = F.unfold(data_main, kernel_size=patch_size, stride=patch_size)
-    numU = h // patch_size
-    numV = w // patch_size
-    subLF_main = rearrange(subLF_main, '(a1 a2) (h w) (n1 n2) -> n1 n2 (a1 h) (a2 w)',
-                      a1=angRes, a2=angRes, h=patch_size, w=patch_size, n1=numU, n2=numV)
-    subLF_left = F.unfold(data_left, kernel_size=patch_size, stride=patch_size)
-    subLF_left = rearrange(subLF_left, '(a1 a2) (h w) (1 n2) -> 1 n2 (a1 h) (a2 w)',
-                      a1=angRes, a2=angRes, h=patch_size, w=patch_size, n2=numV)
-    subLF_down = F.unfold(data_down, kernel_size=patch_size, stride=patch_size)
-    subLF_down = rearrange(subLF_down, '(a1 a2) (h w) (n1 1) -> n1 1 (a1 h) (a2 w)',
-                      a1=angRes, a2=angRes, h=patch_size, w=patch_size, n1=numU)
-    subLF_slope = rearrange(data_slope, '(a1 a2) 1 h w -> 1 1 (a1 h) (a2 w)',
-                      a1=angRes, a2=angRes, h=patch_size, w=patch_size)
-
-    return subLF_main, subLF_left, subLF_down, subLF_slope
-
-def LFintegrate1(subLF_main, subLF_left, subLF_down, subLF_slope, angRes, pz, LFout, scale):
-    if subLF_main.dim() == 4:
-        subLF_main = rearrange(subLF_main, 'n1 n2 (a1 h) (a2 w) -> (a1 a2) (n1 h) (n2 w)', a1=angRes, a2=angRes)
-        subLF_left = rearrange(subLF_left, 'n1 n2 (a1 h) (a2 w) -> (a1 a2) (n1 h) (n2 w)', a1=angRes, a2=angRes)
-        subLF_down = rearrange(subLF_down, 'n1 n2 (a1 h) (a2 w) -> (a1 a2) (n1 h) (n2 w)', a1=angRes, a2=angRes)
-        subLF_slope = rearrange(subLF_slope, 'n1 n2 (a1 h) (a2 w) -> (a1 a2) (n1 h) (n2 w)', a1=angRes, a2=angRes)
-        pass
-    
-    [_, h_main, w_main] = subLF_main.size()
-    LFout[:, 0:h_main, 0:w_main] = subLF_main
-    LFout[:, -pz*scale:, 0:w_main] = subLF_left
-    LFout[:, 0:h_main, -pz*scale:] = subLF_down
-    LFout[:, -pz*scale:, -pz*scale:] = subLF_slope
-
-    return LFout
-
 def LFintegrate(subLF, angRes, pz, stride, h, w):
     if subLF.dim() == 4:
         subLF = rearrange(subLF, 'n1 n2 (a1 h) (a2 w) -> n1 n2 a1 a2 h w', a1=angRes, a2=angRes)
