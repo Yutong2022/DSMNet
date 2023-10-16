@@ -7,7 +7,7 @@ Yutong Liu, Zhen Cheng, Zeyu Xiao, and Zhiwei Xiong, Light Field Super-Resolutio
 <!-- [Light Field Super-Resolution with Zero-Shot Learning](https://openaccess.thecvf.com/content/CVPR2021/html/Cheng_Light_Field_Super-Resolution_With_Zero-Shot_Learning_CVPR_2021_paper.html). In CVPR 2021. (Oral) -->
 <!-- [Paper](https://openaccess.thecvf.com/content/CVPR2021/papers/Cheng_Light_Field_Super-Resolution_With_Zero-Shot_Learning_CVPR_2021_paper.pdf) | [Bibtex](https://github.com/Joechann0831/LFZSSR#citation) -->
 
-[Paper]() | [Bibtex]()
+[Paper](https://ieeexplore.ieee.org/abstract/document/10268449) | [Bibtex](https://github.com/Yutong2022/DSMNet#citation)
 
 
 
